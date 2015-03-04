@@ -56,6 +56,7 @@ class Webgrind_Preprocessor
 		$headers = array();
 		$nameCompression = false;
 		$fn = [];
+                $fl = [];
                 
 		// Read information into memory
 		while(($line = fgets($in))){
@@ -72,9 +73,20 @@ class Webgrind_Preprocessor
                                         $fn[$matches[1]] = $function;
                                     }
                                 }
+                                $filename = substr(trim($line),3);
+                                if($nameCompression) {
+                                    $matches = [];
+                                    preg_match('/^\(([\d]+)\)\s{0,1}(.*)/', $filename, $matches);
+                                    if(isset($fl[$matches[1]])) {
+                                        $filename = $fl[$matches[1]];
+                                    }else{
+                                        $filename = $matches[2];
+                                        $fl[$matches[1]] = $filename;
+                                    }
+                                }
 				if(!isset($functions[$function])){
 					$functions[$function] = array(
-                        'filename'              => substr(trim($line),3), 
+                        'filename'              => $filename, 
                         'invocationCount'       => 0,
                         'nr'                    => $nextFuncNr++,
                         'count'                 => 0,
